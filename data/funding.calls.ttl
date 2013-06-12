@@ -297,7 +297,7 @@
                     "Initial Training Network "@en ;
       property:validFrom  "2011-07-20"^^xsd:date ;
       dcterms:description
-                    "ITN is a host driven action, i.e. applicants are research organizations: universities, public and private research centres, non-profit organisations, large companies, SMEs, etc. Typical networks comprise at least 3 partners (“multi-sites”). Mono-partner networks are also eligible under certain conditions (“mono-site”). See more information on the back. "@en ;
+                    "ITN is a host driven action, i.e. applicants are research organizations: universities, public and private research centres, non-profit organisations, large companies, SMEs, etc. Typical networks comprise at least 3 partners (“multi-sites”). Mono-partner networks are also eligible under certain conditions (“mono-site��). See more information on the back. "@en ;
       dcterms:identifier  "425f26a0-d109-4a51-9009-5f9ae4f3534a" ;
       dcterms:identifier  "FP7-PEOPLE-ITN-2012" ;
       dcterms:title  "Initial Training Network "@en ;
@@ -461,7 +461,7 @@
       rdfs:label    "Energy Call Part 1 "@en ;
       property:validFrom  "2011-07-19"^^xsd:date ;
       dcterms:description
-                    "<p>.</p> "@en ;
+                    " "@en ;
       dcterms:identifier  "FP7-ENERGY-2012-1" ;
       dcterms:identifier  "c0da62e8-d34b-4ca3-acac-a94ab27e061f" ;
       dcterms:identifier  "007fb9b9-7bf1-4e0d-b374-91892de23df3" ;
