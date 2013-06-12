@@ -32,7 +32,7 @@ CONSTRUCT {
     ?primaryURI
         a class:Call ;
         dcterms:identifier ?identifier ;
-        dcterms:identifier ?uuidentifier ;
+        owl:sameAs ?uuidURI ;
         dcterms:isPartOf ?isPartOfURI ;
         dcterms:hasPart ?hasPartURI ;
         dcterms:title ?titleWithLang ;
@@ -51,6 +51,9 @@ CONSTRUCT {
         property:fundingScheme ?fundingScheme ;
     .
 
+    ?uuidURI
+        owl:sameAs ?primaryURI .
+
     ?isPartOfURI
         a class:Topic ;
         dcterms:identifier ?isPartOfIdentifier ;
@@ -59,11 +62,11 @@ CONSTRUCT {
 }
 FROM <../data/calls.csv>
 WHERE {
-    BIND (REPLACE(?id, ' ', '-') AS ?identifier)
-    BIND (REPLACE(?uuid, ' ', '-') AS ?uuidentifier)
+    BIND (REPLACE(REPLACE(?id, "^ +| +$", ''), ' ', '-') AS ?identifier)
+    BIND (URI(CONCAT('urn:uuid:', REPLACE(REPLACE(?uuid, "^ +| +$", ''), ' ', '-'))) AS ?uuidURI)
     BIND (URI(CONCAT('http://fusepool.info/doc/call/', ?identifier)) AS ?primaryURI)
-    BIND (REPLACE(?isPartOfId, ' ', '-') AS ?isPartOfIdentifier)
-    BIND (REPLACE(?hasPartId, ' ', '-') AS ?hasPartIdentifier)
+    BIND (REPLACE(REPLACE(?isPartOfId, "^ +| +$", ''), ' ', '-') AS ?isPartOfIdentifier)
+    BIND (REPLACE(REPLACE(?hasPartId, "^ +| +$", ''), ' ', '-') AS ?hasPartIdentifier)
     BIND (URI(CONCAT('http://fusepool.info/doc/topic/', ?hasPartIdentifier)) AS ?hasPartURI)
 
     BIND (STRLANG(?title, "en") AS ?titleWithLang)
@@ -75,8 +78,8 @@ WHERE {
     BIND (STRLANG(?notes, "en") AS ?notesWithLang)
     BIND (STRLANG(?comments, "en") AS ?commentsWithLang)
 
-    BIND (URI(REPLACE(?seeAlso, ' ', '-')) AS ?seeAlsoURI)
-    BIND (URI(REPLACE(?source, ' ', '-')) AS ?sourceURI)
+    BIND (URI(REPLACE(REPLACE(?seeAlso, "^ +| +$", ''), ' ', '-')) AS ?seeAlsoURI)
+    BIND (URI(REPLACE(REPLACE(?source, "^ +| +$", ''), ' ', '-')) AS ?sourceURI)
 
     BIND (STRLANG(?FundingScheme, "en") AS ?fundingScheme)
     BIND (STRLANG(?ProjectBudget, "en") AS ?topicBudget)
