@@ -25,44 +25,55 @@ PREFIX property: <http://fusepool.info/property/>
 PREFIX class: <http://fusepool.info/class/>
 PREFIX dataset: <http://fusepool.info/dataset/>
 
+#TODO: Separate class assignment?
+
 CONSTRUCT {
-    ?topicURI
+#General purpose
+    ?primaryURI
         a class:Topic ;
-        dcterms:identifier ?id ;
-        dcterms:isPartOf ?callURI ;
-        dcterms:title ?title ;
-        rdfs:label ?title ;
-        dcterms:description ?topicDescription ;
+        dcterms:identifier ?identifier ;
+        dcterms:isPartOf ?isPartOfURI ;
+        dcterms:hasPart ?hasPartURI ;
+        dcterms:title ?titleWithLang ;
+        rdfs:label ?titleWithLang ;
+        dcterms:description ?descriptionWithLang ;
+        property:validFrom ?validFromWithDatatype ;
+        property:validTo ?validToWithDatatype ;
+        skos:note ?notesWithLang ;
+        rdfs:comment ?commentsWithLang ;
+
+#Data specific
         property:budget ?topicBudget ;
         property:fundingScheme ?fundingScheme ;
-        dcterms:valid ?topicDeadline ;
-
-        skos:note ?topicNote ;
-        rdfs:comment ?topicComments ;
     .
 
-    ?callURI
+    ?isPartOfURI
         a class:Call ;
-        dcterms:identifier ?callID ;
-        dcterms:hasPart ?topicURI ;
+        dcterms:identifier ?isPartOfIdentifier ;
+        dcterms:hasPart ?primaryURI ;
     .
 }
 FROM <../data/topic.csv>
 WHERE {
-    BIND (REPLACE(?id, ' ', '-') AS ?topicID)
-    BIND (URI(CONCAT('http://fusepool.info/doc/topic/', REPLACE(?id, ' ', '-'))) AS ?topicURI)
-    BIND (STRLANG(?title, "en") AS ?topicTitle)
-    BIND (STRLANG(?description, "en") AS ?topicDescription)
+    BIND (REPLACE(?id, ' ', '-') AS ?identifier)
+    BIND (URI(CONCAT('http://fusepool.info/doc/topic/', ?identifier)) AS ?primaryURI)
+    BIND (REPLACE(?isPartOfId, ' ', '-') AS ?isPartOfIdentifier)
+    BIND (REPLACE(?hasPartId, ' ', '-') AS ?hasPartIdentifier)
+    BIND (URI(CONCAT('http://fusepool.info/doc/call/', ?isPartOfIdentifier)) AS ?isPartOfURI)
+    BIND (URI(CONCAT('http://fusepool.info/doc/project/', ?hasPartIdentifier)) AS ?hasPartURI)
 
-    BIND (REPLACE(?parentID, ' ', '-') AS ?callID)
-    BIND (URI(CONCAT('http://fusepool.info/doc/call/', REPLACE(?callID, ' ', '-'))) AS ?callURI)
+    BIND (STRLANG(?title, "en") AS ?titleWithLang)
+    BIND (STRLANG(?description, "en") AS ?descriptionWithLang)
+
+    BIND (STRDT(REPLACE(?validFrom, ' ', ''), xsd:date) AS ?validFromWithDatatype)
+    BIND (STRDT(REPLACE(?validUntil, ' ', ''), xsd:date) AS ?validUntilWithDatatype)
+
+    BIND (STRLANG(?notes, "en") AS ?notesWithLang)
+    BIND (STRLANG(?comments, "en") AS ?commentsWithLang)
+
 
     BIND (STRLANG(?FundingScheme, "en") AS ?fundingScheme)
     BIND (STRLANG(?ProjectBudget, "en") AS ?topicBudget)
 
-    BIND (STRDT(REPLACE(?Deadline, ' ', ''), xsd:date) AS ?topicDeadline)
-
-    BIND (STRLANG(?TopicMouseOverDeadline, "en") AS ?topicNote)
-    BIND (STRLANG(?TopicComments, "en") AS ?topicComments)
 }
 OFFSET 1
