@@ -32,6 +32,7 @@ CONSTRUCT {
     ?primaryURI
         a class:Topic ;
         dcterms:identifier ?identifier ;
+        dcterms:identifier ?uuidentifier ;
         dcterms:isPartOf ?isPartOfURI ;
         dcterms:hasPart ?hasPartURI ;
         dcterms:title ?titleWithLang ;
@@ -41,6 +42,9 @@ CONSTRUCT {
         property:validTo ?validToWithDatatype ;
         skos:note ?notesWithLang ;
         rdfs:comment ?commentsWithLang ;
+
+        owl:seeAlso ?seeAlsoURI ;
+        dcterms:source ?sourceURI ;
 
 #Data specific
         property:budget ?topicBudget ;
@@ -53,9 +57,10 @@ CONSTRUCT {
         dcterms:hasPart ?primaryURI ;
     .
 }
-FROM <../data/topic.csv>
+FROM <../data/topics.csv>
 WHERE {
     BIND (REPLACE(?id, ' ', '-') AS ?identifier)
+    BIND (REPLACE(?uuid, ' ', '-') AS ?uuidentifier)
     BIND (URI(CONCAT('http://fusepool.info/doc/topic/', ?identifier)) AS ?primaryURI)
     BIND (REPLACE(?isPartOfId, ' ', '-') AS ?isPartOfIdentifier)
     BIND (REPLACE(?hasPartId, ' ', '-') AS ?hasPartIdentifier)
@@ -71,6 +76,8 @@ WHERE {
     BIND (STRLANG(?notes, "en") AS ?notesWithLang)
     BIND (STRLANG(?comments, "en") AS ?commentsWithLang)
 
+    BIND (REPLACE(?seeAlso, ' ', '-') AS ?seeAlsoURI)
+    BIND (REPLACE(?source, ' ', '-') AS ?sourceURI)
 
     BIND (STRLANG(?FundingScheme, "en") AS ?fundingScheme)
     BIND (STRLANG(?ProjectBudget, "en") AS ?topicBudget)
