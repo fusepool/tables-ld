@@ -43,7 +43,7 @@ CONSTRUCT {
         skos:note ?notesWithLang ;
         rdfs:comment ?commentsWithLang ;
 
-        owl:seeAlso ?seeAlsoURI ;
+        rdfs:seeAlso ?seeAlsoURI ;
         dcterms:source ?sourceURI ;
 
 #Data specific
@@ -75,8 +75,8 @@ WHERE {
     BIND (STRLANG(?notes, "en") AS ?notesWithLang)
     BIND (STRLANG(?comments, "en") AS ?commentsWithLang)
 
-    BIND (REPLACE(?seeAlso, ' ', '-') AS ?seeAlsoURI)
-    BIND (REPLACE(?source, ' ', '-') AS ?sourceURI)
+    BIND (URI(REPLACE(?seeAlso, ' ', '-')) AS ?seeAlsoURI)
+    BIND (URI(REPLACE(?source, ' ', '-')) AS ?sourceURI)
 
     BIND (STRLANG(?FundingScheme, "en") AS ?fundingScheme)
     BIND (STRLANG(?ProjectBudget, "en") AS ?topicBudget)
