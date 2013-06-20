@@ -6,6 +6,7 @@ import static org.apache.stanbol.enhancer.servicesapi.helper.EnhancementEngineHe
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.Dictionary;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import org.apache.clerezza.rdf.ontologies.DCTERMS;
 import org.apache.clerezza.rdf.ontologies.FOAF;
 import org.apache.commons.io.IOUtils;
 import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.ConfigurationPolicy;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
@@ -47,11 +49,15 @@ import eu.fusepool.platform.enhancer.engine.cvs.tarql.Tarql;
 
 
 
-@Component(immediate = true, metatype = true)
+@Component(immediate = true, metatype = true,
+		configurationFactory = true, //allow multiple instances
+		 policy = ConfigurationPolicy.OPTIONAL) //create a default instance with the default configuration
+		 
 @Service
 @Properties(value={
 		@Property(name=EnhancementEngine.PROPERTY_NAME, value="CSVEngine"),
-		@Property(name=Constants.SERVICE_RANKING,intValue=CSVEnhancementEngine.DEFAULT_SERVICE_RANKING)
+		@Property(name=Constants.SERVICE_RANKING,intValue=CSVEnhancementEngine.DEFAULT_SERVICE_RANKING),
+		@Property(name="Query", value=CSVEnhancementEngine.DEFAULT_QUERY)
 })
 public class CSVEnhancementEngine 
 extends AbstractEnhancementEngine<IOException,RuntimeException> 
@@ -70,9 +76,13 @@ implements EnhancementEngine, ServiceProperties {
 	 */
 	public static final Integer defaultOrder = ORDERING_EXTRACTION_ENHANCEMENT;
 
-
+	public static final String  DEFAULT_QUERY = "/calls.q" ;
+	
 	// MIME TYPE of the PubMed document
-	public static final String MIME_TYPE_XML = "application/xml";
+	public static final String MIME_TYPE_CSV = "text/csv";
+	
+	public static final String ENGINE_URI = "urn:fusepool-csv-engine:part-01:" ;
+	
 
 	final Logger logger = LoggerFactory.getLogger(this.getClass()) ;
 
@@ -99,6 +109,7 @@ implements EnhancementEngine, ServiceProperties {
 	protected ComponentContext componentContext ;
 	protected BundleContext    bundleContext ;
 	Parser parser ;
+	String usedQuery = DEFAULT_QUERY ;
 
 
 
@@ -108,9 +119,16 @@ implements EnhancementEngine, ServiceProperties {
 		this.componentContext = ce ;
 		this.bundleContext = ce.getBundleContext() ;
 
+		
+		@SuppressWarnings("rawtypes")
+		Dictionary dict = ce.getProperties() ;
+		Object o = dict.get("Query") ;
+		if(o!=null && !"".equals(o.toString()))  {
+			usedQuery = (String) o ;
+		}
 
 		logger.info("activating "+this.getClass().getName());
-
+		logger.info("using query: "+usedQuery);
 	}
 
 	protected void deactivate(ComponentContext ce) {
@@ -129,7 +147,7 @@ implements EnhancementEngine, ServiceProperties {
 		UriRef contentItemId = ci.getUri();
 		logger.info("UriRef: "+contentItemId.getUnicodeString()) ;
 
-		Tarql tarql = new Tarql() ;
+		Tarql tarql = new Tarql(usedQuery) ;
 
 		try {
 
@@ -176,7 +194,7 @@ implements EnhancementEngine, ServiceProperties {
 
 		try {
 
-			UriRef partUri = new UriRef("urn:fusepool-pubmed-engine:part-01:" + randomUUID()); // part uri with index 1 (part with index 0 is reserved to the input data)
+			UriRef partUri = new UriRef(ENGINE_URI + randomUUID()); // part uri with index 1 (part with index 0 is reserved to the input data)
 			// Add the same content of the document as text/plain. This part can contain some
 			// text extracted from the full content for indexing as title and abstract 
 

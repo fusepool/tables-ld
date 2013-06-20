@@ -32,6 +32,14 @@ public class Tarql {
 	
 	private static String outputFormat = "RDF/XML" ;
 	
+	
+	private String query ;
+	
+	
+	public Tarql(String query) {
+		this.query = query ;
+	}
+	
 	public String transfrom(InputStream is) throws Exception {
 		Model resultModel = ModelFactory.createDefaultModel();
 		
@@ -67,12 +75,19 @@ public class Tarql {
 	
 	Reader readQuery() throws UnsupportedEncodingException {
 		
-		InputStream toRet = this.getClass().getResourceAsStream("/calls.q") ;	
+		InputStream toRet = this.getClass().getResourceAsStream(query) ;	
 		return new InputStreamReader(toRet, "UTF-8");
 	}
 	
 	Reader readCsv(InputStream is) throws UnsupportedEncodingException {
 	
 		return new InputStreamReader(is, "UTF-8");
+	}
+
+	/**
+	 * @return the query
+	 */
+	public String getQuery() {
+		return query;
 	}
 }
