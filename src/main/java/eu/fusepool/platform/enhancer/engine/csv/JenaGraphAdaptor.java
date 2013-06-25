@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package eu.fusepool.platform.enhancer.engine.cvs;
+package eu.fusepool.platform.enhancer.engine.csv;
 
 import com.hp.hpl.jena.graph.BulkUpdateHandler;
 import com.hp.hpl.jena.graph.Graph;
