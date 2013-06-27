@@ -232,7 +232,13 @@ implements EnhancementEngine, ServiceProperties {
 		MGraph enhancements = new IndexedMGraph();
 
 		if (! xml2rdf.isEmpty()) {
-
+			UriRef uri = new UriRef("http://fusepool.info/class/Call") ;
+			Iterator<Triple> triples=  xml2rdf.filter(null, null, uri) ;
+			int i = 0 ;
+			while (triples.hasNext()) {
+				Triple triple = (Triple) triples.next();
+				logger.debug(String.valueOf(++i)+" "+triple.getSubject().toString()) ;
+			}
 		}
 
 		return enhancements;		

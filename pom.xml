@@ -8,7 +8,7 @@
 		<groupId>org.apache.stanbol</groupId>
 		<artifactId>apache-stanbol-enhancement-engines</artifactId>
 		<!-- <artifactId>org.apache.stanbol.enhancer.parent</artifactId> -->
-		 <version>0.10.1-SNAPSHOT</version>
+		<version>0.10.1-SNAPSHOT</version>
 	</parent>
 
 	<groupId>eu.fusepool.platform</groupId>
@@ -122,7 +122,7 @@
 		<dependency>
 			<groupId>xml-resolver</groupId>
 			<artifactId>xml-resolver</artifactId>
-			 <version>1.2</version>
+			<version>1.2</version>
 		</dependency>
 
 		<dependency>
@@ -160,19 +160,20 @@
 			<artifactId>slf4j-simple</artifactId>
 			<scope>test</scope>
 		</dependency>
-		 
+
 		<dependency>
 			<groupId>org.apache.clerezza</groupId>
 			<artifactId>rdf.jena.sparql</artifactId>
 			<scope>compile</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.clerezza</groupId>
 			<artifactId>rdf.jena.parser</artifactId>
 			<!-- <version>0.10-incubating</version> -->
 			<scope>compile</scope>
 		</dependency>
+
 	</dependencies>
 
 </project>
