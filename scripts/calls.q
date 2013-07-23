@@ -21,7 +21,8 @@ PREFIX pmo: <http://www.patexpert.org/ontologies/pmo.owl#>
 PREFIX schema: <http://schema.org/>
 PREFIX bibo: <http://purl.org/ontology/bibo/>
 
-PREFIX fp: <http://fusepool.info/vocab#>
+PREFIX property: <http://fusepool.info/property/>
+PREFIX class: <http://fusepool.info/class/>
 PREFIX dataset: <http://fusepool.info/dataset/>
 
 #TODO: Separate class assignment?
@@ -29,7 +30,7 @@ PREFIX dataset: <http://fusepool.info/dataset/>
 CONSTRUCT {
 #General purpose
     ?primaryURI
-        a fp:Call ;
+        a class:Call ;
         dcterms:identifier ?identifier ;
         owl:sameAs ?uuidURI ;
         dcterms:isPartOf ?isPartOfURI ;
@@ -37,8 +38,8 @@ CONSTRUCT {
         dcterms:title ?titleWithLang ;
         rdfs:label ?titleWithLang ;
         dcterms:description ?descriptionWithLang ;
-        fp:validFrom ?validFromWithDatatype ;
-        fp:validTo ?validToWithDatatype ;
+        property:validFrom ?validFromWithDatatype ;
+        property:validTo ?validToWithDatatype ;
         skos:note ?notesWithLang ;
         rdfs:comment ?commentsWithLang ;
 
@@ -46,15 +47,15 @@ CONSTRUCT {
         dcterms:source ?sourceURI ;
 
 #Data specific
-        fp:budget ?topicBudget ;
-        fp:fundingScheme ?fundingScheme ;
+        property:budget ?topicBudget ;
+        property:fundingScheme ?fundingScheme ;
     .
 
     ?uuidURI
         owl:sameAs ?primaryURI .
 
     ?isPartOfURI
-        a fp:Topic ;
+        a class:Topic ;
         dcterms:identifier ?isPartOfIdentifier ;
         dcterms:isPartOf ?primaryURI ;
     .
