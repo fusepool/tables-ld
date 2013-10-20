@@ -43,12 +43,6 @@ import org.slf4j.LoggerFactory;
 
 import eu.fusepool.platform.enhancer.engine.cvs.tarql.Tarql;
 
-
-
-
-
-
-
 @Component(immediate = true, metatype = true,
 		configurationFactory = true, //allow multiple instances
 		 policy = ConfigurationPolicy.OPTIONAL) //create a default instance with the default configuration
