@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.fusepool.platform.enhancer.engine.cvs.tarql;
+package eu.fusepool.platform.enhancer.engine.csv.tarql;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -10,8 +10,6 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import org.apache.clerezza.rdf.core.MGraph;
-import org.apache.commons.io.IOUtils;
 import org.deri.tarql.CSVQueryExecutionFactory;
 import org.deri.tarql.TarqlParser;
 import org.deri.tarql.TarqlQuery;
@@ -24,7 +22,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 //import eu.fusepool.platform.enhancer.engine.cvs.JenaGraphAdaptor;
 
 /**
- * @author giorgio
+ * @author Giorgio Costa
  *
  */
 public class Tarql {

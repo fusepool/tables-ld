@@ -1,4 +1,4 @@
-package eu.fusepool.platform.enhancer.engine.cvs;
+package eu.fusepool.platform.enhancer.engine.csv;
 
 
 import static org.apache.stanbol.enhancer.servicesapi.helper.EnhancementEngineHelper.randomUUID;
@@ -41,7 +41,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.fusepool.platform.enhancer.engine.cvs.tarql.Tarql;
+import eu.fusepool.platform.enhancer.engine.csv.tarql.Tarql;
 
 @Component(immediate = true, metatype = true,
 		configurationFactory = true, //allow multiple instances
@@ -226,7 +226,13 @@ implements EnhancementEngine, ServiceProperties {
 		MGraph enhancements = new IndexedMGraph();
 
 		if (! xml2rdf.isEmpty()) {
-
+			UriRef uri = new UriRef("http://fusepool.info/class/Call") ;
+			Iterator<Triple> triples=  xml2rdf.filter(null, null, uri) ;
+			int i = 0 ;
+			while (triples.hasNext()) {
+				Triple triple = (Triple) triples.next();
+				logger.debug(String.valueOf(++i)+" "+triple.getSubject().toString()) ;
+			}
 		}
 
 		return enhancements;		
