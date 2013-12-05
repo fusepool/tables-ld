@@ -134,8 +134,7 @@ implements EnhancementEngine, ServiceProperties {
 
 		return ENHANCE_SYNCHRONOUS;
 	}
-
-	@Override
+	
 	public void computeEnhancements(ContentItem ci) throws EngineException {
 
 		UriRef contentItemId = ci.getUri();
@@ -283,8 +282,7 @@ implements EnhancementEngine, ServiceProperties {
 
 		return text;
 	}
-
-	@Override
+	
 	public Map<String, Object> getServiceProperties() {
 		return Collections.unmodifiableMap(Collections.singletonMap(
 				ENHANCEMENT_ENGINE_ORDERING, (Object) defaultOrder));
