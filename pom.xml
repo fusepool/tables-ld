@@ -16,7 +16,7 @@
 	<version>1.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 
-	<name>Fusepool CSV RDFizer</name>
+	<name>Fusepool Enhancement Engine FP7 Project CSV to RDF</name>
         <description>Transform CSV files using SPARQL CONSTRUCT rules</description>
 	<developers>
 		<developer>
@@ -25,9 +25,7 @@
 		<developer>
 			<name>Luigi Selmi</name>
 		</developer>
-		<developer>
-			<name>Sarven Capadisli</name>
-		</developer>
+		
 	</developers>
 
 	<inceptionYear>2013</inceptionYear>
@@ -48,6 +46,7 @@
 		<version>2.3.7</version>
 		<configuration>
 			<instructions>
+			    <Bundle-Category>Stanbol Enahncement Engine </Bundle-Category>
 			    <Embed-Dependency>jena-core;jena-arq;xercesImpl;xml-resolver;jena-iri;jchardet;opencsv;commons-lang3;scope=compile</Embed-Dependency>
 			    <Embed-Transitive>true</Embed-Transitive>
 			    <Import-Package>!sun.io.*, * </Import-Package>
@@ -136,54 +135,56 @@
 		<dependency> <!-- used to parse json responses of geonames.org -->
 			<groupId>org.codehaus.jettison</groupId>
 			<artifactId>jettison</artifactId>
-                        <version>1.3.3</version>
+            <version>1.3.3</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-                        <version>2.4</version>
+            <version>2.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.scr.annotations</artifactId>
-                        <version>1.9.0</version>
+            <version>1.9.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.clerezza</groupId>
 			<artifactId>rdf.core</artifactId>
-                        <version>0.13</version>
+            <version>0.13</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.stanbol</groupId>
 			<artifactId>org.apache.stanbol.entityhub.model.clerezza</artifactId>
-                        <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-                        <version>1.6.6</version>
+             <version>1.6.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
-                        <version>1.6.1</version>
-			
+            <version>1.6.1</version>			
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.clerezza</groupId>
 			<artifactId>rdf.jena.sparql</artifactId>
              <version>0.6</version>
 			<scope>compile</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.clerezza</groupId>
 			<artifactId>rdf.jena.parser</artifactId>
              <version>0.11</version>
 			<scope>compile</scope>
 		</dependency>
-
+        <!-- Rdfizer interface -->
+        <dependency>
+            <groupId>eu.fusepool</groupId>
+            <artifactId>datalifecycle</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
 	</dependencies>
 
 </project>
