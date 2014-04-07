@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Dictionary;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.clerezza.rdf.core.Graph;
 import org.apache.clerezza.rdf.core.MGraph;
@@ -24,6 +26,9 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.ConfigurationPolicy;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.apache.felix.scr.annotations.ReferencePolicy;
 import org.apache.felix.scr.annotations.Service;
 import org.apache.stanbol.commons.indexedgraph.IndexedMGraph;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
@@ -41,7 +46,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.fusepool.platform.enhancer.engine.csv.tarql.Tarql;
+import eu.fusepool.datalifecycle.Rdfizer;
 
 @Component(immediate = true, metatype = true,
 		configurationFactory = true, //allow multiple instances
@@ -72,7 +77,7 @@ implements EnhancementEngine, ServiceProperties {
 
 	public static final String  DEFAULT_QUERY = "/calls.q" ;
 	
-	// MIME TYPE of the PubMed document
+	// MIME TYPE of the CSV document
 	public static final String MIME_TYPE_CSV = "text/csv";
 	
 	public static final String ENGINE_URI = "urn:fusepool-csv-engine:part-01:" ;
@@ -87,24 +92,33 @@ implements EnhancementEngine, ServiceProperties {
 	 */
 	//private final LiteralFactory literalFactory = LiteralFactory.getInstance();
 
-//	public static final Set<String> supportedMediaTypes;
-//	static {
-//		Set<String> types = new HashSet<String>();
-//		//ensure everything is lower case
-//		//		types.add(SupportedFormat.N3.toLowerCase());
-//		//		types.add(SupportedFormat.N_TRIPLE.toLowerCase());
-//		//		types.add(SupportedFormat.RDF_JSON.toLowerCase());
-//		types.add(SupportedFormat.RDF_XML.toLowerCase());
-//		types.add(SupportedFormat.TURTLE.toLowerCase());
-//		//		types.add(SupportedFormat.X_TURTLE.toLowerCase());
-//		supportedMediaTypes = Collections.unmodifiableSet(types);
-//	}
+	public static final Set<String> supportedMediaTypes;
+	static {
+		Set<String> types = new HashSet<String>();
+		//ensure everything is lower case
+		types.add(SupportedFormat.N3.toLowerCase());
+		types.add(SupportedFormat.N_TRIPLE.toLowerCase());
+		types.add(SupportedFormat.RDF_JSON.toLowerCase());
+		types.add(SupportedFormat.RDF_XML.toLowerCase());
+		types.add(SupportedFormat.TURTLE.toLowerCase());
+		types.add(SupportedFormat.X_TURTLE.toLowerCase());
+		supportedMediaTypes = Collections.unmodifiableSet(types);
+	}
 
 	protected ComponentContext componentContext ;
 	protected BundleContext    bundleContext ;
-	Parser parser ;
+	
+	@Reference
+    protected Parser parser;
+	
 	String usedQuery = DEFAULT_QUERY ;
-
+	
+	// Binding to FP7 project CSV rdfizer
+    @Reference(cardinality=ReferenceCardinality.OPTIONAL_MULTIPLE,
+            policy = ReferencePolicy.DYNAMIC,
+            referenceInterface=eu.fusepool.datalifecycle.Rdfizer.class)
+    private Rdfizer rdfizer;
+    public static final String RDFIZER_NAME = "project";
 
 
 	//@SuppressWarnings("unchecked")
@@ -121,13 +135,38 @@ implements EnhancementEngine, ServiceProperties {
 			usedQuery = (String) o ;
 		}
 
-		logger.info("activating "+this.getClass().getName());
-		logger.info("using query: "+usedQuery);
+		logger.info("activating " + this.getClass().getName());
+		logger.info("using query: " + usedQuery);
 	}
 
 	protected void deactivate(ComponentContext ce) {
 		super.deactivate(ce);
 	}
+	
+	/**
+     * Bind FP7 Project CSV rdfizer
+     */
+    protected void bindRdfizer(Rdfizer rdfizer) {
+        
+        if( RDFIZER_NAME.equals( rdfizer.getName() ) ) {
+            this.rdfizer = rdfizer; 
+            logger.info("Rdfizer " + rdfizer.getName() + " bound");            
+        }
+        
+    }
+    
+    /**
+     * Unbind FP7 project CSV rdfizer
+     */
+    protected void unbindRdfizer(Rdfizer rdfizer) {
+        
+        if( RDFIZER_NAME.equals( rdfizer.getName() ) ) {
+            this.rdfizer = null;
+            logger.info("Rdfizer " + rdfizer.getName() + " unbound");
+            
+        }
+        
+    }
 
 
 	public int canEnhance(ContentItem ci) throws EngineException {
@@ -138,42 +177,23 @@ implements EnhancementEngine, ServiceProperties {
 	public void computeEnhancements(ContentItem ci) throws EngineException {
 
 		UriRef contentItemId = ci.getUri();
-		logger.info("UriRef: "+contentItemId.getUnicodeString()) ;
+		logger.info("UriRef: " + contentItemId.getUnicodeString()) ;
 
-		Tarql tarql = new Tarql(usedQuery) ;
+		// Transform the patent XML file into RDF
+		MGraph documentGraph = rdfizer.transform(ci.getStream());
 
-		try {
+		// Create enhancements to each entity extracted from the CSV
+		MGraph enhancements = addEnhancements(ci, documentGraph);
 
-			ci.getLock().writeLock().lock();
-
-			getParser() ;
-			
-			InputStream is = ci.getStream() ;
-
-			String csv2rdf = tarql.transfrom(is) ;
-			if(csv2rdf!=null) {
-				
-				InputStream myInputStream = IOUtils.toInputStream(csv2rdf, "UTF-8");
-				Graph toAdd = parser.parse(myInputStream, SupportedFormat.RDF_XML) ;
-				// Create enhancements to each entity extracted from the CSV
-				MGraph enhancements = addEnhancements(ci, toAdd);
-
-				// Add all the RDF triples to the content item metadata
-				ci.getMetadata().addAll(toAdd);
-				//ci.getMetadata().addAll(enhancements);
-			}
-			// Add a part to the content item as a text/plain representation of the XML document for indexing. 
-			addPartToContentItem(ci);
+	    // Add all the RDF triples to the content item metadata
+		ci.getMetadata().addAll(documentGraph);
+	    ci.getMetadata().addAll(enhancements);
+		
+		// Add a part to the content item as a text/plain representation of the XML document for indexing. 
+		addPartToContentItem(ci);
 
 
-		} catch (Exception e) {
-			logger.error( "Error while computing the enhancements.", e) ;			
-		}
-
-		finally {
-			ci.getLock().writeLock().unlock();
-		}
-
+		
 	}
 
 	/*
@@ -220,7 +240,7 @@ implements EnhancementEngine, ServiceProperties {
 	 * Create an entity annotation for each entity found by the transformation of the XML document. 
 	 * Each annotation is referred to its entity.
 	 */
-	public MGraph addEnhancements(ContentItem ci, Graph xml2rdf) {
+	public MGraph addEnhancements(ContentItem ci, MGraph xml2rdf) {
 
 		MGraph enhancements = new IndexedMGraph();
 
@@ -236,8 +256,6 @@ implements EnhancementEngine, ServiceProperties {
 
 		return enhancements;		
 	}	
-
-
 
 	/*
 	 * Creates a string filled with values from properties:
@@ -300,32 +318,6 @@ implements EnhancementEngine, ServiceProperties {
 		logger.info(this.getClass().getName()+" unregistered") ;
 	}
 
-
-	private void getParser() throws Exception {
-		ServiceReference ref = bundleContext.getServiceReference(Parser.class.getName()) ;
-		if(ref!=null) {
-			parser = (Parser)bundleContext.getService(ref) ;
-		}else {
-			parser = null ;
-			logger.error("Unable to find parser for the enhancement") ;
-			throw new Exception("Cannot get parser!") ;
-		}
-	}
-	
-
-	/**
-	 * Converts the type and the subtype of the parsed media type to the
-	 * string representation as stored in {@link #supportedMediaTypes} and then
-	 * checks if the parsed media type is contained in this list.
-	 * @param mediaType the MediaType instance to check
-	 * @return <code>true</code> if the parsed media type is not 
-	 * <code>null</code> and supported. 
-	 */
-//	@SuppressWarnings("unused")
-//	private boolean isSupported(String mediaType){
-//		return mediaType == null ? false : supportedMediaTypes.contains(
-//				mediaType.toLowerCase());
-//	}
 
 
 }
